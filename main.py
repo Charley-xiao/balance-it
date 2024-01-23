@@ -34,9 +34,9 @@ def update_ball_position(ball_position, velocity, cursor_position):
     ball_position[0] += int(velocity[ball_position[0] // PIXEL_SIZE, ball_position[1] // PIXEL_SIZE, 0])
     ball_position[1] += int(velocity[ball_position[0] // PIXEL_SIZE, ball_position[1] // PIXEL_SIZE, 1])
     # If it collides with the cursor, then it bounces off.
-    if abs(ball_position[0] - cursor_position[0]) <= RADIUS + SIDE_LENGTH // 2:
+    if abs(ball_position[0] - cursor_position[0]) <= RADIUS + SIDE_LENGTH // 2 and abs(ball_position[1] - cursor_position[1]) <= RADIUS + SIDE_LENGTH // 2:
         ball_position[0] -= 2 * int(velocity[ball_position[0] // PIXEL_SIZE, ball_position[1] // PIXEL_SIZE, 0])
-    if abs(ball_position[1] - cursor_position[1]) <= RADIUS + SIDE_LENGTH // 2:
+    if abs(ball_position[1] - cursor_position[1]) <= RADIUS + SIDE_LENGTH // 2 and abs(ball_position[0] - cursor_position[0]) <= RADIUS + SIDE_LENGTH // 2:
         ball_position[1] -= 2 * int(velocity[ball_position[0] // PIXEL_SIZE, ball_position[1] // PIXEL_SIZE, 1])
 
 def init(ball_position, velocity):
@@ -95,6 +95,7 @@ def main():
             font = pygame.font.Font(None, 36)
             survive_time_text = font.render("Score: " + str(survive_time // 10), True, BLACK)
             screen.blit(survive_time_text, (10, 10))
+            pygame.display.flip()
         else:
             gameover_screen()
 
