@@ -16,7 +16,7 @@ Roughly speaking, the higher the Renolds number, the more turbulent the flow is.
 
 ![image](shot.png)
 
-The above takes about 60 seconds to emerge, which is a Carmen vortex street.
+The above takes about 60 seconds to emerge, which appears to be Von Karman vortices.
 
 ## Acknowledgements
 
