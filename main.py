@@ -71,13 +71,13 @@ def gameover_screen():
 def menu_screen():
     font = pygame.font.Font(None, 36)
     menu_text = font.render("Balance It!", True, BLACK)
-    options_text = font.render("Press SPACE to play or 1 to test", True, BLACK)
+    options_text = font.render("Press SPACE to play or 1 to test or 2 in pure mode", True, BLACK)
     screen.blit(menu_text, (WIDTH // 2 - menu_text.get_width() // 2, HEIGHT // 2 - 50))
     screen.blit(options_text, (WIDTH // 2 - options_text.get_width() // 2, HEIGHT // 2 + 20))
     pygame.display.flip()
 
 ####### FLOW DEFINITION #######
-Re = 39.0
+Re = 839.0
 nx = WIDTH // PIXEL_SIZE
 ny = HEIGHT // PIXEL_SIZE
 q = 9
@@ -112,10 +112,11 @@ fin = feq.copy()
 def collision_and_stream(velocity, cursor_position):
     obstacle = np.fromfunction(lambda x, y: 
                                np.logical_or(
+                               np.logical_or(
                                    (x - cursor_position[0] // PIXEL_SIZE) ** 2 + (y - cursor_position[1] // PIXEL_SIZE) ** 2 <= (RADIUS_CURSOR // PIXEL_SIZE) ** 2,
                                    y >= HEIGHT // PIXEL_SIZE,
                                    y <= 0
-                               ), 
+                               ),np.logical_or(0, x >= WIDTH // PIXEL_SIZE)),
                                (nx, ny))
     fin[i1, -1, :] = fin[i1, -2, :]
     fin[i2, -1, :] = fin[i2, -2, :]
@@ -124,7 +125,11 @@ def collision_and_stream(velocity, cursor_position):
     u = np.dot(c.transpose(), fin.transpose((1, 0, 2))) / rho
     u[:, 0, :] = vel[:, 0, :]
     rho[0, :] = 1. / (1. - u[0, 0, :]) * (sumpop(fin[i2, 0, :]) + 2. * sumpop(fin[i1, 0, :]))
+    rho[rho >= MAX_VALUE] = MAX_VALUE
+    rho[rho <= 0] = 0.1
     feq = equilibrium(rho, u)
+    if UNDER_TEST:
+        print(rho)
     fin[i3, 0, :] = fin[i1, 0, :] + feq[i3, 0, :] - fin[i1, 0, :]
     fout = fin - omega * (fin - feq)
     for i in range(q):
@@ -133,6 +138,7 @@ def collision_and_stream(velocity, cursor_position):
         fin[i, :, :] = np.roll(np.roll(fout[i, :, :], c[i, 0], axis=0), c[i, 1], axis=1)
     velocity[:, :, 0] = u[1, :, :]
     velocity[:, :, 1] = u[0, :, :]
+    # velocity[obstacle] = MAX_VELOCITY
 
 def main():
     cursor_position = [WIDTH // 2, HEIGHT // 2]
@@ -141,10 +147,16 @@ def main():
     survive_time = 0
     at_main_menu = True
     render_ball = True
+    pure_mode = False
 
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                # Save velocity to text file
+                with open('velocity.txt', 'w') as f:
+                    for i in range(velocity.shape[0]):
+                        for j in range(velocity.shape[1]):
+                            f.write(f'{velocity[i,j,0]},{velocity[i,j,1]}\n')
                 pygame.quit()
                 sys.exit()
 
@@ -163,9 +175,15 @@ def main():
                 if event.key == pygame.K_SPACE:
                     at_main_menu = False
                     render_ball = True
+                    pure_mode = False
                 elif event.key == pygame.K_1:
                     at_main_menu = False
                     render_ball = False
+                    pure_mode = False
+                elif event.key == pygame.K_2:
+                    at_main_menu = False
+                    render_ball = False
+                    pure_mode = True
             
             if (not at_main_menu) and event.type == pygame.KEYDOWN and (not game_over):
                 if event.key == pygame.K_r:
@@ -176,7 +194,8 @@ def main():
         if at_main_menu:
             menu_screen()
         elif not game_over:
-            collision_and_stream(velocity, cursor_position)
+            for _ in range(10):
+                collision_and_stream(velocity, cursor_position)
             render_velocity(screen)
             try:
                 if render_ball:
@@ -191,12 +210,13 @@ def main():
 
             draw_circle(screen, GOLD, cursor_position, RADIUS_CURSOR)
             survive_time += 1
-            font = pygame.font.Font(None, 36)
-            survive_time_text = font.render("Score: " + str(survive_time // 10), True, BLACK)
-            screen.blit(survive_time_text, (10, 10))
-            font2 = pygame.font.Font(None, 24)
-            notice_text = font2.render("Press R to return to the main menu", True, BLACK)
-            screen.blit(notice_text, (10, 30))
+            if not pure_mode:
+                font = pygame.font.Font(None, 36)
+                survive_time_text = font.render("Score: " + str(survive_time // 10), True, BLACK)
+                screen.blit(survive_time_text, (10, 10))
+                font2 = pygame.font.Font(None, 24)
+                notice_text = font2.render("Press R to return to the main menu", True, BLACK)
+                screen.blit(notice_text, (10, 30))
             if UNDER_TEST and survive_time % 10 == 0:
                 print(f'Ball position: {ball_position[0]}, {ball_position[1]}')
                 print(f'Sample Velocity: {velocity[30,30,0]}, {velocity[30,30,1]}')
