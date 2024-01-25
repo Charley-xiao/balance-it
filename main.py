@@ -152,11 +152,11 @@ def main():
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                # Save velocity to text file
-                with open('velocity.txt', 'w') as f:
-                    for i in range(velocity.shape[0]):
-                        for j in range(velocity.shape[1]):
-                            f.write(f'{velocity[i,j,0]},{velocity[i,j,1]}\n')
+                if UNDER_TEST:
+                    with open('velocity.txt', 'w') as f:
+                        for i in range(velocity.shape[0]):
+                            for j in range(velocity.shape[1]):
+                                f.write(f'{velocity[i,j,0]},{velocity[i,j,1]}\n')
                 pygame.quit()
                 sys.exit()
 
