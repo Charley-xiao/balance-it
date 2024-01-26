@@ -189,9 +189,10 @@ def main():
                 if event.key == pygame.K_r:
                     at_main_menu = True
 
-        screen.fill(WHITE)
+        # screen.fill(WHITE)
 
         if at_main_menu:
+            screen.fill(WHITE)
             menu_screen()
         elif not game_over:
             for _ in range(10):
@@ -222,9 +223,10 @@ def main():
                 print(f'Sample Velocity: {velocity[30,30,0]}, {velocity[30,30,1]}')
             pygame.display.flip()
         else:
+            screen.fill(WHITE)
             gameover_screen()
 
-        pygame.display.flip()
+        # pygame.display.flip()
 
         clock.tick(FPS)
 
