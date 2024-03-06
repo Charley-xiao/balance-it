@@ -4,6 +4,7 @@ import math
 import numpy as np
 # import cupy as cp
 from constants import *
+from numba import jit
 
 pygame.init()
 
@@ -97,6 +98,7 @@ i3 = np.arange(q)[np.asarray([ci[0] > 0 for ci in c])]
 
 ####### FUNCTION DEFINITIONS #######
 sumpop = lambda fin: np.sum(fin, axis=0)
+@jit
 def equilibrium(rho, u):
     cu = 3.0 * np.dot(c, u.transpose(1, 0, 2))
     usqr = 3.0 / 2.0 * (u[0] ** 2 + u[1] ** 2)
