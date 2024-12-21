@@ -4,8 +4,18 @@
 
 ## Run
 
+### Using CPU
+
 ```
 python main.py
+```
+
+### Using GPU
+
+You need to have a CUDA-compatible GPU and install `cupy` to run the GPU version.
+
+```
+python main_gpu.py
 ```
 
 ## Effect
@@ -24,10 +34,11 @@ This is the final project of the track "Computational Fluid Dynamics" in 0-1 Win
 
 ## Others
 
-The code is written in Python 3.8.16, and the following packages are required:
+The code is written and tested in both Python 3.8 and 3.12, and the following packages are required:
 
 - numpy
 - pygame
+- cupy (optional, for GPU acceleration)
 
 **DO NOT** let the initial velocity (constants.WIND_VELOCITY_X) be too large, or the simulation will not be able to converge.
 
